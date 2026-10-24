@@ -1,0 +1,36 @@
+SMARTHR NEXUS - HOW TO RUN
+
+Start:  double-click "START SmartHR.bat" in this folder.
+        The first start installs packages and adds demo data (a few minutes).
+        The website opens at http://localhost:3000
+
+Stop:   close the window titled "SmartHR servers".
+
+Demo logins (pick the matching role on the login page first):
+  Admin           Pallavi Jain    admin@demo.com      Admin@1234
+  Senior Manager  Rohan Mehta     manager@demo.com    Manager@1234
+  HR Recruiter    Priya Sharma    hr@demo.com         HR@12345
+  Employee        Aarav Shah      employee@demo.com   Employee@1234
+
+INDIA EDITION (developed by Pallavi Jain)
+  Demo company: Nexus Infotech Pvt. Ltd., Ahmedabad (offices in Mumbai, Bengaluru, Pune, Hyderabad)
+  Money in Rupees with lakh/crore, dates DD MMM YYYY in IST, financial year April-March
+  Payroll: Basic, HRA, Conveyance, Medical, Special Allowance; PF 12% (wages up to 15,000),
+           ESI 0.75% (gross up to 21,000), Professional Tax by state, TDS under the new
+           tax regime FY 2026-27 (75,000 standard deduction, no tax up to 12 lakh)
+  Leaves: Earned (EL) 18, Casual (CL) 8, Sick (SL) 8, Maternity 26 weeks, Paternity 10, LWP
+  Holidays: Gujarat public holidays 2026 (Uttarayan, Holi, Diwali, Gujarati New Year...)
+  Payroll rules are in backend\src\utils\indianPayroll.js, website helpers in frontend\src\utils\india.js
+
+AI features (ARIA chat, resume screening) need a Google Gemini API key
+(free at https://aistudio.google.com/app/apikey). Put it in:
+  backend\.env   ->  GEMINI_API_KEY=your-key
+  frontend\.env  ->  VITE_GEMINI_API_KEY=your-key
+then close the "SmartHR servers" window and start again.
+
+Reset demo data: delete backend\.demo-data-added and start again.
+
+Changes made for running on this PC (no Redis server here):
+  backend\src\middleware\auth.middleware.js  - skip token blacklist check when Redis is not running
+  backend\src\controllers\auth.controller.js - use Redis only when it is connected
+  backend\.env and frontend\.env created from the .env.example files

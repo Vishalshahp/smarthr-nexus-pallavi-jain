@@ -1,0 +1,7 @@
+﻿[16:17:25] === Starting SmartHR Nexus ===
+[16:17:25] Node.js v24.20.0
+[16:17:25] Database: running
+[16:17:28] Servers starting in the "SmartHR servers" window
+[16:17:33] Login test (admin@demo.com): OK
+[16:17:33] SmartHR is running at http://localhost:3000
+[16:17:33] === Done ===
