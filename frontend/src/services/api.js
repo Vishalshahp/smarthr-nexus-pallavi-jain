@@ -1,7 +1,15 @@
 import axios from 'axios';
 
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
+    return 'https://abraham-website-jessica-edgar.trycloudflare.com/api/v1';
+  }
+  return '/api/v1';
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: getBaseURL(),
   timeout: 30000,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
@@ -39,6 +47,10 @@ api.interceptors.response.use(
       originalRequest?.url?.includes('/auth/refresh-token') ||
       originalRequest?.url?.includes('/auth/login')
     ) {
+      return Promise.reject(error);
+    }
+
+    if (localStorage.getItem('accessToken') === 'demo-mode-token') {
       return Promise.reject(error);
     }
 

@@ -6,8 +6,9 @@ import toast from 'react-hot-toast';
 export const DEMO_USERS = {
   'admin@demo.com': {
     _id: 'demo-admin-001',
-    firstName: 'Jensi',
-    lastName: 'Patel',
+    firstName: 'Pallavi',
+    lastName: 'Jain',
+    fullName: 'Pallavi Jain',
     email: 'admin@demo.com',
     role: 'admin',
     employeeId: 'EMP00001',
@@ -78,28 +79,40 @@ export const DEMO_USERS = {
   },
 };
 
-const DEMO_PASSWORD = 'demo';
 const DEMO_TOKEN = 'demo-mode-token';
 
 // ─── Thunks ──────────────────────────────────────────────────────────────────
 export const loginUser = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
-  const { email, password } = credentials;
+  const { email, password, role } = credentials;
+  const normalizedEmail = email?.toLowerCase().trim();
+  const demoUser = DEMO_USERS[normalizedEmail];
 
-  // Demo mode: bypass backend
-  const demoUser = DEMO_USERS[email?.toLowerCase()];
-  if (demoUser && password === DEMO_PASSWORD) {
-    localStorage.setItem('accessToken', DEMO_TOKEN);
-    localStorage.setItem('demoUser', JSON.stringify(demoUser));
-    return { user: demoUser, accessToken: DEMO_TOKEN, isDemo: true };
-  }
-
+  // Try live API backend first
   try {
     const { data } = await api.post('/auth/login', credentials);
-    localStorage.setItem('accessToken', data.accessToken);
-    return data;
+    if (data && (data.accessToken || data.token || data.user)) {
+      if (data.accessToken) localStorage.setItem('accessToken', data.accessToken);
+      return data;
+    }
   } catch (err) {
+    // If backend is not available, check if valid demo account
+    if (demoUser) {
+      const userObj = { ...demoUser, ...(role ? { role } : {}) };
+      localStorage.setItem('accessToken', DEMO_TOKEN);
+      localStorage.setItem('demoUser', JSON.stringify(userObj));
+      return { user: userObj, accessToken: DEMO_TOKEN, isDemo: true };
+    }
     return rejectWithValue(err.response?.data?.message || 'Login failed. Try demo accounts below.');
   }
+
+  if (demoUser) {
+    const userObj = { ...demoUser, ...(role ? { role } : {}) };
+    localStorage.setItem('accessToken', DEMO_TOKEN);
+    localStorage.setItem('demoUser', JSON.stringify(userObj));
+    return { user: userObj, accessToken: DEMO_TOKEN, isDemo: true };
+  }
+
+  return rejectWithValue('Login failed. Try demo accounts below.');
 });
 
 export const logoutUser = createAsyncThunk('auth/logout', async () => {
